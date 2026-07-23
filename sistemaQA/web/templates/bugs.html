@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Bugs — {{ projeto.name }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span> <a href="{{ url_for('projeto_detalhe', project_id=projeto.id) }}">{{ projeto.name }}</a>
+  <span>›</span> Bugs
+</div>
+
+<div class="page-header"><h1>Bugs</h1></div>
+
+<!-- Formulário novo bug -->
+<div class="card" style="margin-bottom:24px;">
+  <details>
+    <summary class="btn btn-primary btn-sm" style="display:inline-flex; cursor:pointer;">+ Registrar Bug</summary>
+    <div style="margin-top:16px;">
+    <form method="post" action="{{ url_for('bug_novo', project_id=projeto.id) }}">
+      <div class="form-group">
+        <label>Título *</label>
+        <input name="title" type="text" required placeholder="Ex: Botão de checkout não responde no Safari">
+      </div>
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Severidade</label>
+          <select name="severity">
+            {% for s in SEVERITY %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ambiente</label>
+          <input name="environment" type="text" placeholder="Ex: produção, homolog, iOS 17">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea name="description" placeholder="Descreva o comportamento encontrado"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Passos para reproduzir</label>
+        <textarea name="steps_repro" placeholder="1. Acesse /checkout | 2. Clique em Finalizar | 3. Observe..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Reportado por</label>
+        <input name="reported_by" type="text" placeholder="Nome do QA ou analista">
+      </div>
+      <button class="btn btn-primary" type="submit">Registrar Bug</button>
+    </form>
+    </div>
+  </details>
+</div>
+
+<!-- Lista de bugs -->
+<div class="card">
+  <h2>Bugs ({{ bugs|length }})</h2>
+  {% if not bugs %}
+    <p style="color:#57606a;">Nenhum bug registrado.</p>
+  {% else %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Título</th>
+        <th>Severidade</th>
+        <th>Ambiente</th>
+        <th>Reportado por</th>
+        <th>Status</th>
+        <th>Criado em</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in bugs %}
+      {% if b.severity == 'CRÍTICA' %}{% set sev_class = 'badge-red' %}
+      {% elif b.severity == 'ALTA' %}{% set sev_class = 'badge-yellow' %}
+      {% elif b.severity == 'MÉDIA' %}{% set sev_class = 'badge-blue' %}
+      {% else %}{% set sev_class = 'badge-gray' %}{% endif %}
+
+      {% if b.status in ('CORRIGIDO', 'FECHADO') %}{% set st_class = 'badge-green' %}
+      {% elif b.status in ('ABERTO', 'REABERTO') %}{% set st_class = 'badge-red' %}
+      {% else %}{% set st_class = 'badge-yellow' %}{% endif %}
+      <tr>
+        <td>{{ b.id }}</td>
+        <td>
+          <strong>{{ b.title }}</strong>
+          {% if b.description %}<br><span style="font-size:13px; color:#57606a;">{{ b.description[:80] }}{% if b.description|length > 80 %}…{% endif %}</span>{% endif %}
+        </td>
+        <td><span class="badge {{ sev_class }}">{{ b.severity }}</span></td>
+        <td style="font-size:13px;">{{ b.environment or '—' }}</td>
+        <td style="font-size:13px;">{{ b.reported_by or '—' }}</td>
+        <td>
+          <form method="post" action="{{ url_for('bug_status', bug_id=b.id) }}" style="display:flex; gap:4px;">
+            <input type="hidden" name="project_id" value="{{ projeto.id }}">
+            <select name="status" style="font-size:13px; padding:3px 6px; border:1px solid #d0d7de; border-radius:4px;">
+              {% for s in STATUS_BUG %}<option value="{{ s }}" {% if s == b.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-outline btn-sm" type="submit">✓</button>
+          </form>
+        </td>
+        <td style="font-size:12px; color:#57606a; white-space:nowrap;">{{ b.created_at[:10] }}</td>
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-outline btn-sm" href="{{ url_for('bug_editar', bug_id=b.id) }}">Editar</a>
+            <form class="inline-form" method="post" action="{{ url_for('bug_excluir', bug_id=b.id) }}"
+                  onsubmit="return confirm('Excluir bug?')">
+              <input type="hidden" name="project_id" value="{{ projeto.id }}">
+              <button class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}

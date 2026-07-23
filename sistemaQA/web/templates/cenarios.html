@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Cenários Gherkin — {{ projeto.name }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span> <a href="{{ url_for('projeto_detalhe', project_id=projeto.id) }}">{{ projeto.name }}</a>
+  <span>›</span> Cenários Gherkin
+</div>
+
+<div class="page-header"><h1>Cenários de Teste (Gherkin)</h1></div>
+
+<!-- Formulário novo cenário -->
+<div class="card" style="margin-bottom:24px;">
+  <details>
+    <summary class="btn btn-primary btn-sm" style="display:inline-flex; cursor:pointer;">+ Novo Cenário</summary>
+    <div style="margin-top:16px;">
+    <form method="post" action="{{ url_for('cenario_novo', project_id=projeto.id) }}">
+      <div class="form-group">
+        <label>Título *</label>
+        <input name="title" type="text" required placeholder="Ex: Login com credenciais inválidas retorna erro">
+      </div>
+      <div class="form-group">
+        <label>Dado que (Given)</label>
+        <input name="given" type="text" placeholder="o usuário está na página de login">
+      </div>
+      <div class="form-group">
+        <label>Quando (When)</label>
+        <input name="when_" type="text" placeholder="ele insere senha incorreta e clica em Entrar">
+      </div>
+      <div class="form-group">
+        <label>Então (Then)</label>
+        <input name="then_" type="text" placeholder="deve ver a mensagem 'Credenciais inválidas'">
+      </div>
+      <div class="form-group">
+        <label>Tags (separadas por vírgula)</label>
+        <input name="tags" type="text" placeholder="autenticação, segurança, regressão">
+      </div>
+      <button class="btn btn-primary" type="submit">Criar Cenário</button>
+    </form>
+    </div>
+  </details>
+</div>
+
+<!-- Lista de cenários -->
+<div class="card">
+  <h2>Cenários ({{ scenarios|length }})</h2>
+  {% if not scenarios %}
+    <p style="color:#57606a;">Nenhum cenário cadastrado.</p>
+  {% else %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Título</th>
+        <th>Gherkin</th>
+        <th>Tags</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for sc in scenarios %}
+      {% if sc.status == 'APROVADO' %}{% set sc_class = 'badge-green' %}
+      {% elif sc.status == 'REPROVADO' %}{% set sc_class = 'badge-red' %}
+      {% else %}{% set sc_class = 'badge-yellow' %}{% endif %}
+      <tr>
+        <td>{{ sc.id }}</td>
+        <td><strong>{{ sc.title }}</strong></td>
+        <td style="font-size:13px; color:#444;">
+          {% if sc.given %}<div><span style="color:#7c5cd8; font-weight:600;">Dado que</span> {{ sc.given }}</div>{% endif %}
+          {% if sc.when_ %}<div><span style="color:#7c5cd8; font-weight:600;">Quando</span> {{ sc.when_ }}</div>{% endif %}
+          {% if sc.then_ %}<div><span style="color:#7c5cd8; font-weight:600;">Então</span> {{ sc.then_ }}</div>{% endif %}
+        </td>
+        <td>
+          {% if sc.tags %}
+            {% for tag in sc.tags.split(',') %}
+              <span class="badge badge-blue">{{ tag.strip() }}</span>
+            {% endfor %}
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          <form method="post" action="{{ url_for('cenario_status', scenario_id=sc.id) }}" style="display:flex; gap:4px;">
+            <input type="hidden" name="project_id" value="{{ projeto.id }}">
+            <select name="status" style="font-size:13px; padding:3px 6px; border:1px solid #d0d7de; border-radius:4px;">
+              {% for s in STATUS_SC %}<option value="{{ s }}" {% if s == sc.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-outline btn-sm" type="submit">✓</button>
+          </form>
+        </td>
+        <td>
+          <form class="inline-form" method="post" action="{{ url_for('cenario_excluir', scenario_id=sc.id) }}"
+                onsubmit="return confirm('Excluir cenário?')">
+            <input type="hidden" name="project_id" value="{{ projeto.id }}">
+            <button class="btn btn-danger btn-sm">Excluir</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}

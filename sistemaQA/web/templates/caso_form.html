@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Editar Caso — Sistema QA{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span>
+  {% if project_id %}<a href="{{ url_for('casos', project_id=project_id) }}">Casos de Teste</a><span>›</span>{% endif %}
+  Editar Caso
+</div>
+
+<div class="card" style="max-width:700px;">
+  <h2>Editar Caso de Teste</h2>
+  <form method="post">
+    <div class="grid grid-2">
+      <div class="form-group">
+        <label>Suite</label>
+        <select name="suite_id">
+          {% for s in suites %}<option value="{{ s.id }}" {% if s.id == case.suite_id %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Prioridade</label>
+        <select name="priority">
+          {% for p in PRIORITY %}<option value="{{ p }}" {% if p == case.priority %}selected{% endif %}>{{ p }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Título *</label>
+      <input name="title" type="text" required value="{{ case.title }}">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea name="description">{{ case.description or '' }}</textarea>
+    </div>
+    <div class="grid grid-2">
+      <div class="form-group">
+        <label>Pré-condições</label>
+        <textarea name="preconditions">{{ case.preconditions or '' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Passos</label>
+        <textarea name="steps">{{ case.steps or '' }}</textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Resultado Esperado</label>
+      <textarea name="expected">{{ case.expected or '' }}</textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" type="submit">Salvar</button>
+      {% if project_id %}
+      <a class="btn btn-outline" href="{{ url_for('casos', project_id=project_id) }}">Cancelar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
