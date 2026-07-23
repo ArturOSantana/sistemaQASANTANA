@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema QA</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 15px; line-height: 1.6; background: #f0f2f5; color: #1f2328; }
+a { color: #3b82d4; text-decoration: none; cursor: pointer; }
+a:hover { text-decoration: underline; }
+
+nav { background: #1a2332; color: #fff; padding: 0 24px; display: flex; align-items: center; gap: 8px; height: 52px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,.3); flex-wrap: wrap; }
+nav .brand { font-weight: 700; font-size: 16px; color: #fff; letter-spacing: .5px; cursor: pointer; padding: 4px 8px; border-radius:4px; }
+nav .brand span { color: #4ca3ff; }
+nav .nav-link { color: #c9d1d9; font-size: 14px; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+nav .nav-link:hover { background: rgba(255,255,255,.1); color: #fff; }
+nav .nav-link.active { background: rgba(255,255,255,.15); color: #fff; }
+nav .spacer { flex: 1; }
+nav .nav-sep { color: #4ca3ff; font-size: 11px; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p  { color: #57606a; font-size: 14px; margin-top: 4px; }
+
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; }
+.card h2 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #1f2328; }
+
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+.kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; }
+.kpi .label { font-size: 12px; color: #57606a; text-transform: uppercase; letter-spacing: .5px; }
+.kpi .value { font-size: 28px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
+.kpi.red .value    { color: #d1242f; }
+.kpi.green .value  { color: #1a7f37; }
+.kpi.blue .value   { color: #3b82d4; }
+.kpi.yellow .value { color: #9a6700; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid transparent; background: none; }
+.btn-primary { background: #3b82d4; color: #fff; border-color: #3b82d4; }
+.btn-primary:hover { background: #2563af; border-color: #2563af; }
+.btn-danger  { background: #d1242f; color: #fff; border-color: #d1242f; }
+.btn-danger:hover  { background: #a0191e; }
+.btn-outline { background: #fff; color: #1f2328; border-color: #d0d7de; }
+.btn-outline:hover { background: #f6f8fa; }
+.btn-success { background: #1a7f37; color: #fff; border-color: #1a7f37; }
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+.btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #444; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 8px 12px; border: 1px solid #d0d7de; border-radius: 6px;
+  font-size: 14px; font-family: inherit; background: #fff; color: #1f2328;
+}
+.form-group textarea { resize: vertical; min-height: 72px; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: #3b82d4; box-shadow: 0 0 0 3px rgba(59,130,212,.15);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { background: #f6f8fa; text-align: left; padding: 9px 12px; font-size: 12px; font-weight: 600; color: #57606a; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #e5e7eb; }
+td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafbfc; }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-green  { background: #d4edda; color: #155724; }
+.badge-red    { background: #fce4e4; color: #a00; }
+.badge-yellow { background: #fff3cd; color: #856404; }
+.badge-blue   { background: #d0e6ff; color: #1a56a8; }
+.badge-gray   { background: #e9ecef; color: #444; }
+.badge-purple { background: #ede0ff; color: #6f42c1; }
+
+.flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+.flash.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flash.error   { background: #fce4e4; color: #721c24; border: 1px solid #f5c6cb; }
+.flash-close { cursor: pointer; font-size: 18px; line-height: 1; opacity: .6; background: none; border: none; color: inherit; }
+
+.breadcrumb { font-size: 13px; color: #57606a; margin-bottom: 16px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.breadcrumb a { color: #57606a; cursor: pointer; }
+.breadcrumb a:hover { color: #3b82d4; }
+.breadcrumb .sep { color: #aaa; }
+
+.inline-select { font-size: 13px; padding: 3px 6px; border: 1px solid #d0d7de; border-radius: 4px; background: #fff; cursor: pointer; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 10px; padding: 28px 32px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; position: relative; }
+.modal h2 { font-size: 18px; margin-bottom: 20px; }
+.modal-close { position: absolute; top: 16px; right: 20px; font-size: 22px; cursor: pointer; background: none; border: none; color: #666; }
+
+.bar-row { margin-bottom: 10px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+.bar-track { height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; }
+.bar-fill  { height: 100%; border-radius: 5px; }
+
+.empty-state { color: #57606a; font-size: 14px; padding: 24px 0; text-align: center; }
+
+details summary { cursor: pointer; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details[open] summary { margin-bottom: 16px; }
+
+.tag-chip { display: inline-block; background: #d0e6ff; color: #1a56a8; padding: 1px 7px; border-radius: 20px; font-size: 12px; font-weight: 600; margin: 1px 2px; }
+
+.view { display: none; }
+.view.active { display: block; }
+
+@media (max-width: 600px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .modal { padding: 20px 16px; }
+  nav { gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <span class="brand" onclick="goTo('dashboard')">Sistema <span>QA</span></span>
+  <span class="nav-link" id="nav-dashboard" onclick="goTo('dashboard')">Dashboard</span>
+  <span class="nav-link" id="nav-projetos"  onclick="goTo('projetos')">Projetos</span>
+  <span class="spacer"></span>
+  <span style="color:#4ca3ff; font-size:12px;" id="nav-storage">localStorage</span>
+</nav>
+
+<!-- ── FLASH ── -->
+<div id="flash-area" style="max-width:1100px; margin:12px auto 0; padding:0 20px;"></div>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="view" id="view-dashboard">
+    <div class="page-header">
+      <h1>Dashboard Global</h1>
+      <p>Visão geral de todos os projetos</p>
+    </div>
+    <div class="grid grid-4" id="kpi-global" style="margin-bottom:24px;"></div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 style="margin:0;">Projetos</h2>
+        <button class="btn btn-primary btn-sm" onclick="openModal('modal-projeto', null)">+ Novo Projeto</button>
+      </div>
+      <div id="table-projetos-dash"></div>
+    </div>
+  </div>
+
+  <!-- ===== PROJETOS ===== -->
+  <div class="view" id="view-projetos">
+    <div class="page-header">
+      <h1>Projetos</h1>
+    </div>
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="openModal('modal-projeto', null)">+ Novo Projeto</button>
+    </div>
+    <div id="table-projetos-page"></div>
+  </div>
+
+  <!-- ===== PROJETO DETALHE ===== -->
+  <div class="view" id="view-projeto-detalhe">
+    <div class="breadcrumb">
+      <a onclick="goTo('projetos')">Projetos</a>
+      <span class="sep">›</span>
+      <span id="bc-projeto-nome"></span>
+    </div>
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h1 id="detalhe-nome"></h1>
+        <p id="detalhe-desc"></p>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline btn-sm" id="btn-editar-projeto">Editar</button>
+        <button class="btn btn-outline btn-sm" id="btn-exportar-csv">⬇ Exportar CSV</button>
+      </div>
+    </div>
+    <div class="grid grid-4" id="kpi-projeto" style="margin-bottom:24px;"></div>
+    <div class="grid grid-2" style="margin-bottom:24px;" id="graficos-projeto"></div>
+    <div class="card">
+      <h2>Módulos do Projeto</h2>
+      <div class="btn-group" id="modulos-links"></div>
+    </div>
+  </div>
+
+  <!-- ===== SUITES ===== -->
+  <div class="view" id="view-suites">
+    <div class="breadcrumb">
+      <a onclick="goTo('projetos')">Projetos</a>
+      <span class="sep">›</span>
+      <a id="bc-suite-projeto" onclick="goToDetalhe()"></a>
+      <span class="sep">›</span> Suites de Teste
+    </div>
+    <div class="page-header"><h1>Suites de Teste</h1></div>
+    <div class="card" style="margin-bottom:24px;">
+      <details>
+        <summary class="btn btn-primary btn-sm" style="display:inline-flex;">+ Nova Suite</summary>
+        <div>
+          <div class="form-group"><label>Nome *</label><input id="suite-nome" type="text" placeholder="Ex: Testes de Regressão"></div>
+          <div class="form-group"><label>Descrição</label><input id="suite-desc" type="text" placeholder="Descrição opcional"></div>
+          <button class="btn btn-primary" onclick="criarSuite()">Criar Suite</button>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <h2 id="suites-count">Suites</h2>
+      <div id="table-suites"></div>
+    </div>
+  </div>
+
+  <!-- ===== CASOS DE TESTE ===== -->
+  <div class="view" id="view-casos">
+    <div class="breadcrumb">
+      <a onclick="goTo('projetos')">Projetos</a>
+      <span class="sep">›</span>
+      <a id="bc-caso-projeto" onclick="goToDetalhe()"></a>
+      <span class="sep">›</span> Casos de Teste
+    </div>
+    <div class="page-header"><h1>Casos de Teste</h1></div>
+    <div class="card" style="margin-bottom:24px;">
+      <details>
+        <summary class="btn btn-primary btn-sm" style="display:inline-flex;">+ Novo Caso de Teste</summary>
+        <div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Suite *</label><select id="caso-suite"></select></div>
+            <div class="form-group"><label>Prioridade</label>
+              <select id="caso-prioridade">
+                <option>BAIXA</option><option selected>MÉDIA</option><option>ALTA</option><option>CRÍTICA</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>Título *</label><input id="caso-titulo" type="text" placeholder="Ex: Login com credenciais válidas"></div>
+          <div class="form-group"><label>Descrição</label><textarea id="caso-desc" placeholder="Descrição opcional"></textarea></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Pré-condições</label><textarea id="caso-pre" placeholder="O que precisa estar configurado antes"></textarea></div>
+            <div class="form-group"><label>Passos (separe por | )</label><textarea id="caso-passos" placeholder="1. Abrir login | 2. Inserir e-mail"></textarea></div>
+          </div>
+          <div class="form-group"><label>Resultado Esperado</label><textarea id="caso-esperado" placeholder="O que deve acontecer após os passos"></textarea></div>
+          <button class="btn btn-primary" onclick="criarCaso()">Criar Caso</button>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <h2 id="casos-count">Casos</h2>
+      <div id="table-casos"></div>
+    </div>
+  </div>
+
+  <!-- ===== CENÁRIOS GHERKIN ===== -->
+  <div class="view" id="view-cenarios">
+    <div class="breadcrumb">
+      <a onclick="goTo('projetos')">Projetos</a>
+      <span class="sep">›</span>
+      <a id="bc-cenario-projeto" onclick="goToDetalhe()"></a>
+      <span class="sep">›</span> Cenários Gherkin
+    </div>
+    <div class="page-header"><h1>Cenários de Teste (Gherkin)</h1></div>
+    <div class="card" style="margin-bottom:24px;">
+      <details>
+        <summary class="btn btn-primary btn-sm" style="display:inline-flex;">+ Novo Cenário</summary>
+        <div>
+          <div class="form-group"><label>Título *</label><input id="cenario-titulo" type="text" placeholder="Ex: Login com credenciais inválidas retorna erro"></div>
+          <div class="form-group"><label>Dado que (Given)</label><input id="cenario-given" type="text" placeholder="o usuário está na página de login"></div>
+          <div class="form-group"><label>Quando (When)</label><input id="cenario-when" type="text" placeholder="ele insere senha incorreta e clica em Entrar"></div>
+          <div class="form-group"><label>Então (Then)</label><input id="cenario-then" type="text" placeholder="deve ver a mensagem 'Credenciais inválidas'"></div>
+          <div class="form-group"><label>Tags (separadas por vírgula)</label><input id="cenario-tags" type="text" placeholder="autenticação, segurança, regressão"></div>
+          <button class="btn btn-primary" onclick="criarCenario()">Criar Cenário</button>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <h2 id="cenarios-count">Cenários</h2>
+      <div id="table-cenarios"></div>
+    </div>
+  </div>
+
+  <!-- ===== BUGS ===== -->
+  <div class="view" id="view-bugs">
+    <div class="breadcrumb">
+      <a onclick="goTo('projetos')">Projetos</a>
+      <span class="sep">›</span>
+      <a id="bc-bug-projeto" onclick="goToDetalhe()"></a>
+      <span class="sep">›</span> Bugs
+    </div>
+    <div class="page-header"><h1>Bugs</h1></div>
+    <div class="card" style="margin-bottom:24px;">
+      <details>
+        <summary class="btn btn-primary btn-sm" style="display:inline-flex;">+ Registrar Bug</summary>
+        <div>
+          <div class="form-group"><label>Título *</label><input id="bug-titulo" type="text" placeholder="Ex: Botão de checkout não responde no Safari"></div>
+          <div class="grid grid-2">
+            <div class="form-group"><label>Severidade</label>
+              <select id="bug-severidade">
+                <option>BAIXA</option><option selected>MÉDIA</option><option>ALTA</option><option>CRÍTICA</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Ambiente</label><input id="bug-ambiente" type="text" placeholder="Ex: produção, homolog, iOS 17"></div>
+          </div>
+          <div class="form-group"><label>Descrição</label><textarea id="bug-desc" placeholder="Descreva o comportamento encontrado"></textarea></div>
+          <div class="form-group"><label>Passos para reproduzir</label><textarea id="bug-passos" placeholder="1. Acesse /checkout | 2. Clique em Finalizar"></textarea></div>
+          <div class="form-group"><label>Reportado por</label><input id="bug-reporter" type="text" placeholder="Nome do QA ou analista"></div>
+          <button class="btn btn-primary" onclick="criarBug()">Registrar Bug</button>
+        </div>
+      </details>
+    </div>
+    <div class="card">
+      <h2 id="bugs-count">Bugs</h2>
+      <div id="table-bugs"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Modal Projeto -->
+<div class="modal-overlay" id="modal-projeto">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-projeto')">×</button>
+    <h2 id="modal-projeto-titulo">Novo Projeto</h2>
+    <input type="hidden" id="mp-id">
+    <div class="form-group"><label>Nome *</label><input id="mp-nome" type="text" placeholder="Nome do projeto"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="mp-desc" placeholder="Descrição opcional"></textarea></div>
+    <div class="btn-group" style="justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-projeto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarProjeto()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Caso -->
+<div class="modal-overlay" id="modal-caso">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-caso')">×</button>
+    <h2>Editar Caso de Teste</h2>
+    <input type="hidden" id="mc-id">
+    <div class="grid grid-2">
+      <div class="form-group"><label>Suite *</label><select id="mc-suite"></select></div>
+      <div class="form-group"><label>Prioridade</label>
+        <select id="mc-prioridade">
+          <option>BAIXA</option><option>MÉDIA</option><option>ALTA</option><option>CRÍTICA</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Título *</label><input id="mc-titulo" type="text"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="mc-desc"></textarea></div>
+    <div class="grid grid-2">
+      <div class="form-group"><label>Pré-condições</label><textarea id="mc-pre"></textarea></div>
+      <div class="form-group"><label>Passos (separe por | )</label><textarea id="mc-passos"></textarea></div>
+    </div>
+    <div class="form-group"><label>Resultado Esperado</label><textarea id="mc-esperado"></textarea></div>
+    <div class="btn-group" style="justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-caso')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCaso()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Bug -->
+<div class="modal-overlay" id="modal-bug">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-bug')">×</button>
+    <h2>Editar Bug</h2>
+    <input type="hidden" id="mb-id">
+    <div class="form-group"><label>Título *</label><input id="mb-titulo" type="text"></div>
+    <div class="grid grid-2">
+      <div class="form-group"><label>Severidade</label>
+        <select id="mb-severidade">
+          <option>BAIXA</option><option>MÉDIA</option><option>ALTA</option><option>CRÍTICA</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Ambiente</label><input id="mb-ambiente" type="text"></div>
+    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="mb-desc"></textarea></div>
+    <div class="form-group"><label>Passos para reproduzir</label><textarea id="mb-passos"></textarea></div>
+    <div class="form-group"><label>Reportado por</label><input id="mb-reporter" type="text"></div>
+    <div class="btn-group" style="justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('modal-bug')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarBug()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════════════════════
+const DB_KEY = 'qa_system_v1';
+
+function loadDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY)) || emptyDB(); }
+  catch { return emptyDB(); }
+}
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function emptyDB() {
+  return { nextId: 1, projects: [], suites: [], cases: [], scenarios: [], bugs: [] };
+}
+function nextId(db) { return db.nextId++; }
+function now() { return new Date().toISOString(); }
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let currentView = 'dashboard';
+let currentProjectId = null;
+
+// ═══════════════════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════
+function goTo(view, projectId) {
+  if (projectId !== undefined) currentProjectId = projectId;
+  currentView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + view);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + view);
+  if (navEl) navEl.classList.add('active');
+  render();
+  window.scrollTo(0, 0);
+}
+
+function goToDetalhe() { goTo('projeto-detalhe', currentProjectId); }
+
+// ═══════════════════════════════════════════════════════
+// FLASH
+// ═══════════════════════════════════════════════════════
+function flash(msg, type = 'success') {
+  const area = document.getElementById('flash-area');
+  const div = document.createElement('div');
+  div.className = 'flash ' + type;
+  div.innerHTML = `<span>${escHtml(msg)}</span><button class="flash-close" onclick="this.parentElement.remove()">×</button>`;
+  area.prepend(div);
+  setTimeout(() => div.remove(), 4000);
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITÁRIOS
+// ═══════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function dateFmt(iso) { return iso ? iso.slice(0,10) : '—'; }
+function badgeHtml(text, cls) { return `<span class="badge ${cls}">${escHtml(text)}</span>`; }
+
+function statusBadgeTC(s) {
+  const m = {PASSOU:'badge-green',FALHOU:'badge-red',BLOQUEADO:'badge-yellow',IGNORADO:'badge-purple','NÃO EXECUTADO':'badge-gray'};
+  return badgeHtml(s, m[s] || 'badge-gray');
+}
+function prioClass(p) {
+  return {CRÍTICA:'badge-red',ALTA:'badge-yellow',MÉDIA:'badge-blue',BAIXA:'badge-gray'}[p] || 'badge-gray';
+}
+function sevClass(s) {
+  return {CRÍTICA:'badge-red',ALTA:'badge-yellow',MÉDIA:'badge-blue',BAIXA:'badge-gray'}[s] || 'badge-gray';
+}
+function statusBugClass(s) {
+  if (['CORRIGIDO','FECHADO'].includes(s)) return 'badge-green';
+  if (['ABERTO','REABERTO'].includes(s)) return 'badge-red';
+  return 'badge-yellow';
+}
+function statusScClass(s) {
+  return {APROVADO:'badge-green',REPROVADO:'badge-red',PENDENTE:'badge-yellow'}[s] || 'badge-gray';
+}
+
+function barRow(label, val, total, color) {
+  if (!total) return '';
+  const pct = Math.round(val / total * 100);
+  return `<div class="bar-row">
+    <div class="bar-label"><span>${escHtml(label)}</span><span style="color:#57606a">${val} (${pct}%)</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+}
+
+function emptyState(msg) {
+  return `<div class="empty-state">${escHtml(msg)}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function openModal(id, data) {
+  if (id === 'modal-projeto') {
+    document.getElementById('mp-id').value = data ? data.id : '';
+    document.getElementById('mp-nome').value = data ? data.name : '';
+    document.getElementById('mp-desc').value = data ? (data.description || '') : '';
+    document.getElementById('modal-projeto-titulo').textContent = data ? 'Editar Projeto' : 'Novo Projeto';
+  }
+  if (id === 'modal-caso') {
+    const db = loadDB();
+    const suites = db.suites.filter(s => s.project_id === currentProjectId);
+    let opts = suites.map(s => `<option value="${s.id}" ${data && data.suite_id===s.id?'selected':''}>${escHtml(s.name)}</option>`).join('');
+    document.getElementById('mc-suite').innerHTML = opts || '<option>—</option>';
+    document.getElementById('mc-id').value = data ? data.id : '';
+    document.getElementById('mc-titulo').value = data ? data.title : '';
+    document.getElementById('mc-desc').value = data ? (data.description||'') : '';
+    document.getElementById('mc-pre').value = data ? (data.preconditions||'') : '';
+    document.getElementById('mc-passos').value = data ? (data.steps||'') : '';
+    document.getElementById('mc-esperado').value = data ? (data.expected||'') : '';
+    document.getElementById('mc-prioridade').value = data ? data.priority : 'MÉDIA';
+  }
+  if (id === 'modal-bug') {
+    document.getElementById('mb-id').value = data ? data.id : '';
+    document.getElementById('mb-titulo').value = data ? data.title : '';
+    document.getElementById('mb-severidade').value = data ? data.severity : 'MÉDIA';
+    document.getElementById('mb-ambiente').value = data ? (data.environment||'') : '';
+    document.getElementById('mb-desc').value = data ? (data.description||'') : '';
+    document.getElementById('mb-passos').value = data ? (data.steps_repro||'') : '';
+    document.getElementById('mb-reporter').value = data ? (data.reported_by||'') : '';
+  }
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════════════
+// PROJETOS
+// ═══════════════════════════════════════════════════════
+function salvarProjeto() {
+  const db = loadDB();
+  const id = document.getElementById('mp-id').value;
+  const name = document.getElementById('mp-nome').value.trim();
+  const description = document.getElementById('mp-desc').value.trim();
+  if (!name) { flash('Nome do projeto é obrigatório.', 'error'); return; }
+  if (id) {
+    const p = db.projects.find(x => x.id == id);
+    if (p) { p.name = name; p.description = description; }
+    flash(`Projeto '${name}' atualizado.`);
+  } else {
+    const exists = db.projects.find(x => x.name.toLowerCase() === name.toLowerCase());
+    if (exists) { flash('Já existe um projeto com esse nome.', 'error'); return; }
+    db.projects.push({ id: nextId(db), name, description, created_at: now() });
+    flash(`Projeto '${name}' criado.`);
+  }
+  saveDB(db);
+  closeModal('modal-projeto');
+  render();
+}
+
+function excluirProjeto(id) {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === id);
+  if (!p) return;
+  if (!confirm(`Excluir projeto '${p.name}'? Todos os dados serão removidos.`)) return;
+  db.projects   = db.projects.filter(x => x.id !== id);
+  const sids    = db.suites.filter(s => s.project_id === id).map(s => s.id);
+  db.suites     = db.suites.filter(s => s.project_id !== id);
+  db.cases      = db.cases.filter(c => !sids.includes(c.suite_id));
+  db.scenarios  = db.scenarios.filter(s => s.project_id !== id);
+  db.bugs       = db.bugs.filter(b => b.project_id !== id);
+  saveDB(db);
+  flash(`Projeto '${p.name}' excluído.`);
+  render();
+}
+
+function renderTabelaProjetos(containerId) {
+  const db = loadDB();
+  const el = document.getElementById(containerId);
+  if (!db.projects.length) { el.innerHTML = emptyState('Nenhum projeto cadastrado.'); return; }
+  let rows = db.projects.map(p => `<tr>
+    <td>${p.id}</td>
+    <td><a onclick="goTo('projeto-detalhe',${p.id})"><strong>${escHtml(p.name)}</strong></a></td>
+    <td style="color:#57606a">${escHtml(p.description||'—')}</td>
+    <td style="color:#57606a;font-size:13px">${dateFmt(p.created_at)}</td>
+    <td><div class="btn-group">
+      <button class="btn btn-outline btn-sm" onclick="goTo('projeto-detalhe',${p.id})">Ver</button>
+      <button class="btn btn-outline btn-sm" onclick="openModal('modal-projeto', loadDB().projects.find(x=>x.id===${p.id}))">Editar</button>
+      <button class="btn btn-danger btn-sm" onclick="excluirProjeto(${p.id})">Excluir</button>
+    </div></td>
+  </tr>`).join('');
+  el.innerHTML = `<table><thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Criado em</th><th>Ações</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PROJETO DETALHE / SUMÁRIO
+// ═══════════════════════════════════════════════════════
+function getSummary(projectId) {
+  const db = loadDB();
+  const sids = db.suites.filter(s => s.project_id === projectId).map(s => s.id);
+  const cases = db.cases.filter(c => sids.includes(c.suite_id));
+  const bugs = db.bugs.filter(b => b.project_id === projectId);
+  const scenarios = db.scenarios.filter(s => s.project_id === projectId);
+  const total = cases.length;
+  const passed = cases.filter(c => c.status === 'PASSOU').length;
+  const failed = cases.filter(c => c.status === 'FALHOU').length;
+  const blocked = cases.filter(c => c.status === 'BLOQUEADO').length;
+  const skipped = cases.filter(c => c.status === 'IGNORADO').length;
+  const notRun  = cases.filter(c => c.status === 'NÃO EXECUTADO').length;
+  const executed = total - notRun;
+  const coverage = total ? Math.round(executed / total * 100) : 0;
+  const passRate = executed ? Math.round(passed / executed * 100) : 0;
+
+  const casesByStatus = {};
+  cases.forEach(c => { casesByStatus[c.status] = (casesByStatus[c.status]||0)+1; });
+  const bugsBySev = {};
+  bugs.forEach(b => { bugsBySev[b.severity] = (bugsBySev[b.severity]||0)+1; });
+  const bugsByStatus = {};
+  bugs.forEach(b => { bugsByStatus[b.status] = (bugsByStatus[b.status]||0)+1; });
+  const scByStatus = {};
+  scenarios.forEach(s => { scByStatus[s.status] = (scByStatus[s.status]||0)+1; });
+
+  return {
+    total_cases: total, passed, failed, blocked, skipped, not_run: notRun,
+    executed, coverage, pass_rate: passRate,
+    total_bugs: bugs.length,
+    open_bugs: bugs.filter(b => ['ABERTO','REABERTO'].includes(b.status)).length,
+    total_scenarios: scenarios.length,
+    cases_by_status: casesByStatus, bugs_by_severity: bugsBySev,
+    bugs_by_status: bugsByStatus, scenarios_by_status: scByStatus,
+  };
+}
+
+function getGlobalSummary() {
+  const db = loadDB();
+  let totalCases=0, openBugs=0, totalBugs=0, totalScenarios=0, totalCovCases=0, totalExec=0, totalPassed=0;
+  db.projects.forEach(p => {
+    const s = getSummary(p.id);
+    totalCases += s.total_cases;
+    openBugs += s.open_bugs;
+    totalBugs += s.total_bugs;
+    totalScenarios += s.total_scenarios;
+    totalCovCases += s.total_cases;
+    totalExec += s.executed;
+    totalPassed += s.passed;
+  });
+  const globalCoverage = totalCovCases ? Math.round(totalExec / totalCovCases * 100) : 0;
+  const globalPassRate = totalExec ? Math.round(totalPassed / totalExec * 100) : 0;
+  return { total_projects: db.projects.length, total_cases: totalCases, open_bugs: openBugs, total_bugs: totalBugs, total_scenarios: totalScenarios, global_coverage: globalCoverage, global_pass_rate: globalPassRate };
+}
+
+function kpiHtml(label, value, color) {
+  return `<div class="kpi ${color}"><div class="label">${escHtml(label)}</div><div class="value">${escHtml(String(value))}</div></div>`;
+}
+
+function renderDetalhe() {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === currentProjectId);
+  if (!p) { goTo('projetos'); return; }
+
+  document.getElementById('bc-projeto-nome').textContent = p.name;
+  document.getElementById('detalhe-nome').textContent = p.name;
+  document.getElementById('detalhe-desc').textContent = p.description || '';
+
+  document.getElementById('btn-editar-projeto').onclick = () => openModal('modal-projeto', p);
+  document.getElementById('btn-exportar-csv').onclick = () => exportarCSV(p.id);
+
+  const s = getSummary(p.id);
+  document.getElementById('kpi-projeto').innerHTML = [
+    kpiHtml('Total Casos', s.total_cases, 'blue'),
+    kpiHtml('Passaram', s.passed, 'green'),
+    kpiHtml('Falharam', s.failed, 'red'),
+    kpiHtml('Bloqueados', s.blocked, 'yellow'),
+    kpiHtml('Cobertura', s.coverage + '%', 'blue'),
+    kpiHtml('Taxa Aprovação', s.pass_rate + '%', 'green'),
+    kpiHtml('Bugs', s.total_bugs, 'red'),
+    kpiHtml('Cenários', s.total_scenarios, 'blue'),
+  ].join('');
+
+  // Gráficos
+  const g1 = s.total_cases ? `<div class="card"><h2>Status dos Casos de Teste</h2>
+    ${barRow('PASSOU', s.cases_by_status['PASSOU']||0, s.total_cases, '#1a7f37')}
+    ${barRow('FALHOU', s.cases_by_status['FALHOU']||0, s.total_cases, '#d1242f')}
+    ${barRow('BLOQUEADO', s.cases_by_status['BLOQUEADO']||0, s.total_cases, '#9a6700')}
+    ${barRow('IGNORADO', s.cases_by_status['IGNORADO']||0, s.total_cases, '#7c5cd8')}
+    ${barRow('NÃO EXECUTADO', s.cases_by_status['NÃO EXECUTADO']||0, s.total_cases, '#57606a')}
+  </div>` : `<div class="card"><h2>Status dos Casos de Teste</h2>${emptyState('Sem casos de teste.')}</div>`;
+
+  const g2 = s.total_bugs ? `<div class="card"><h2>Bugs por Severidade</h2>
+    ${barRow('CRÍTICA', s.bugs_by_severity['CRÍTICA']||0, s.total_bugs, '#d1242f')}
+    ${barRow('ALTA', s.bugs_by_severity['ALTA']||0, s.total_bugs, '#e36209')}
+    ${barRow('MÉDIA', s.bugs_by_severity['MÉDIA']||0, s.total_bugs, '#9a6700')}
+    ${barRow('BAIXA', s.bugs_by_severity['BAIXA']||0, s.total_bugs, '#1a7f37')}
+  </div>` : `<div class="card"><h2>Bugs por Severidade</h2>${emptyState('Nenhum bug registrado.')}</div>`;
+
+  document.getElementById('graficos-projeto').innerHTML = g1 + g2;
+
+  document.getElementById('modulos-links').innerHTML = `
+    <button class="btn btn-outline" onclick="goTo('suites',${p.id})">Suites de Teste</button>
+    <button class="btn btn-outline" onclick="goTo('casos',${p.id})">Casos de Teste</button>
+    <button class="btn btn-outline" onclick="goTo('cenarios',${p.id})">Cenários Gherkin</button>
+    <button class="btn btn-outline" onclick="goTo('bugs',${p.id})">Bugs</button>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════
+// SUITES
+// ═══════════════════════════════════════════════════════
+function criarSuite() {
+  const db = loadDB();
+  const name = document.getElementById('suite-nome').value.trim();
+  const desc = document.getElementById('suite-desc').value.trim();
+  if (!name) { flash('Nome da suite é obrigatório.', 'error'); return; }
+  db.suites.push({ id: nextId(db), project_id: currentProjectId, name, description: desc, created_at: now() });
+  saveDB(db);
+  document.getElementById('suite-nome').value = '';
+  document.getElementById('suite-desc').value = '';
+  flash(`Suite '${name}' criada.`);
+  renderSuites();
+}
+
+function excluirSuite(id) {
+  const db = loadDB();
+  const s = db.suites.find(x => x.id === id);
+  if (!s || !confirm(`Excluir suite '${s.name}'?`)) return;
+  db.suites = db.suites.filter(x => x.id !== id);
+  db.cases  = db.cases.filter(c => c.suite_id !== id);
+  saveDB(db);
+  flash(`Suite '${s.name}' excluída.`);
+  renderSuites();
+}
+
+function renderSuites() {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === currentProjectId);
+  if (p) {
+    document.getElementById('bc-suite-projeto').textContent = p.name;
+  }
+  const suites = db.suites.filter(s => s.project_id === currentProjectId);
+  document.getElementById('suites-count').textContent = `Suites (${suites.length})`;
+  const el = document.getElementById('table-suites');
+  if (!suites.length) { el.innerHTML = emptyState('Nenhuma suite cadastrada.'); return; }
+  const casesCount = id => db.cases.filter(c => c.suite_id === id).length;
+  let rows = suites.map(s => `<tr>
+    <td>${s.id}</td>
+    <td><strong>${escHtml(s.name)}</strong>${s.description ? `<br><span style="font-size:13px;color:#57606a">${escHtml(s.description)}</span>` : ''}</td>
+    <td>${casesCount(s.id)} caso(s)</td>
+    <td style="font-size:13px;color:#57606a">${dateFmt(s.created_at)}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="excluirSuite(${s.id})">Excluir</button></td>
+  </tr>`).join('');
+  el.innerHTML = `<table><thead><tr><th>#</th><th>Nome</th><th>Casos</th><th>Criado em</th><th>Ações</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CASOS DE TESTE
+// ═══════════════════════════════════════════════════════
+function criarCaso() {
+  const db = loadDB();
+  const suiteId = parseInt(document.getElementById('caso-suite').value);
+  const title   = document.getElementById('caso-titulo').value.trim();
+  if (!title || !suiteId) { flash('Título e suite são obrigatórios.', 'error'); return; }
+  db.cases.push({
+    id: nextId(db), suite_id: suiteId,
+    title, description: document.getElementById('caso-desc').value.trim(),
+    preconditions: document.getElementById('caso-pre').value.trim(),
+    steps: document.getElementById('caso-passos').value.trim(),
+    expected: document.getElementById('caso-esperado').value.trim(),
+    priority: document.getElementById('caso-prioridade').value,
+    status: 'NÃO EXECUTADO', created_at: now(), executed_at: null,
+  });
+  saveDB(db);
+  document.getElementById('caso-titulo').value = '';
+  document.getElementById('caso-desc').value = '';
+  document.getElementById('caso-pre').value = '';
+  document.getElementById('caso-passos').value = '';
+  document.getElementById('caso-esperado').value = '';
+  flash(`Caso '${title}' criado.`);
+  renderCasos();
+}
+
+function salvarCaso() {
+  const db = loadDB();
+  const id = parseInt(document.getElementById('mc-id').value);
+  const c = db.cases.find(x => x.id === id);
+  if (!c) return;
+  const title = document.getElementById('mc-titulo').value.trim();
+  if (!title) { flash('Título é obrigatório.', 'error'); return; }
+  c.suite_id     = parseInt(document.getElementById('mc-suite').value);
+  c.title        = title;
+  c.description  = document.getElementById('mc-desc').value.trim();
+  c.preconditions= document.getElementById('mc-pre').value.trim();
+  c.steps        = document.getElementById('mc-passos').value.trim();
+  c.expected     = document.getElementById('mc-esperado').value.trim();
+  c.priority     = document.getElementById('mc-prioridade').value;
+  saveDB(db);
+  closeModal('modal-caso');
+  flash('Caso atualizado.');
+  renderCasos();
+}
+
+function atualizarStatusCaso(id, status) {
+  const db = loadDB();
+  const c = db.cases.find(x => x.id === id);
+  if (!c) return;
+  c.status = status;
+  c.executed_at = status !== 'NÃO EXECUTADO' ? now() : null;
+  saveDB(db);
+  flash('Status atualizado.');
+  renderCasos();
+}
+
+function excluirCaso(id) {
+  const db = loadDB();
+  const c = db.cases.find(x => x.id === id);
+  if (!c || !confirm(`Excluir caso '${c.title}'?`)) return;
+  db.cases = db.cases.filter(x => x.id !== id);
+  saveDB(db);
+  flash('Caso excluído.');
+  renderCasos();
+}
+
+function renderCasos() {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === currentProjectId);
+  if (p) document.getElementById('bc-caso-projeto').textContent = p.name;
+  const suites = db.suites.filter(s => s.project_id === currentProjectId);
+  // preenche select do form de novo caso
+  document.getElementById('caso-suite').innerHTML = suites.map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('') || '<option>Crie uma suite primeiro</option>';
+  const sids = suites.map(s => s.id);
+  const cases = db.cases.filter(c => sids.includes(c.suite_id));
+  document.getElementById('casos-count').textContent = `Casos cadastrados (${cases.length})`;
+  const el = document.getElementById('table-casos');
+  if (!cases.length) { el.innerHTML = emptyState('Nenhum caso de teste cadastrado.'); return; }
+  const suiteMap = {};
+  suites.forEach(s => suiteMap[s.id] = s.name);
+  const STATUS_TC = ['NÃO EXECUTADO','PASSOU','FALHOU','BLOQUEADO','IGNORADO'];
+  let rows = cases.map(tc => {
+    const opts = STATUS_TC.map(s => `<option value="${s}" ${s===tc.status?'selected':''}>${s}</option>`).join('');
+    return `<tr>
+      <td>${tc.id}</td>
+      <td><strong>${escHtml(tc.title)}</strong>${tc.description?`<br><span style="font-size:13px;color:#57606a">${escHtml(tc.description.slice(0,80))}${tc.description.length>80?'…':''}</span>`:''}</td>
+      <td>${badgeHtml(suiteMap[tc.suite_id]||'?', 'badge-gray')}</td>
+      <td>${badgeHtml(tc.priority, prioClass(tc.priority))}</td>
+      <td>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <select class="inline-select" onchange="atualizarStatusCaso(${tc.id}, this.value)">${opts}</select>
+        </div>
+      </td>
+      <td style="font-size:12px;color:#57606a;white-space:nowrap">${dateFmt(tc.executed_at)}</td>
+      <td><div class="btn-group">
+        <button class="btn btn-outline btn-sm" onclick="openModal('modal-caso', loadDB().cases.find(x=>x.id===${tc.id}))">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCaso(${tc.id})">Excluir</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table><thead><tr><th>#</th><th>Título</th><th>Suite</th><th>Prioridade</th><th>Status</th><th>Executado em</th><th>Ações</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CENÁRIOS GHERKIN
+// ═══════════════════════════════════════════════════════
+function criarCenario() {
+  const db = loadDB();
+  const title = document.getElementById('cenario-titulo').value.trim();
+  if (!title) { flash('Título é obrigatório.', 'error'); return; }
+  db.scenarios.push({
+    id: nextId(db), project_id: currentProjectId, title,
+    given: document.getElementById('cenario-given').value.trim(),
+    when_: document.getElementById('cenario-when').value.trim(),
+    then_: document.getElementById('cenario-then').value.trim(),
+    tags:  document.getElementById('cenario-tags').value.trim(),
+    status: 'PENDENTE', created_at: now(),
+  });
+  saveDB(db);
+  ['cenario-titulo','cenario-given','cenario-when','cenario-then','cenario-tags'].forEach(id => document.getElementById(id).value = '');
+  flash(`Cenário '${title}' criado.`);
+  renderCenarios();
+}
+
+function atualizarStatusCenario(id, status) {
+  const db = loadDB();
+  const s = db.scenarios.find(x => x.id === id);
+  if (!s) return;
+  s.status = status;
+  saveDB(db);
+  flash('Status do cenário atualizado.');
+  renderCenarios();
+}
+
+function excluirCenario(id) {
+  const db = loadDB();
+  const s = db.scenarios.find(x => x.id === id);
+  if (!s || !confirm('Excluir cenário?')) return;
+  db.scenarios = db.scenarios.filter(x => x.id !== id);
+  saveDB(db);
+  flash('Cenário excluído.');
+  renderCenarios();
+}
+
+function renderCenarios() {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === currentProjectId);
+  if (p) document.getElementById('bc-cenario-projeto').textContent = p.name;
+  const scenarios = db.scenarios.filter(s => s.project_id === currentProjectId);
+  document.getElementById('cenarios-count').textContent = `Cenários (${scenarios.length})`;
+  const el = document.getElementById('table-cenarios');
+  if (!scenarios.length) { el.innerHTML = emptyState('Nenhum cenário cadastrado.'); return; }
+  const STATUS_SC = ['PENDENTE','APROVADO','REPROVADO'];
+  let rows = scenarios.map(sc => {
+    const opts = STATUS_SC.map(s => `<option value="${s}" ${s===sc.status?'selected':''}>${s}</option>`).join('');
+    const tags = sc.tags ? sc.tags.split(',').map(t => `<span class="tag-chip">${escHtml(t.trim())}</span>`).join('') : '—';
+    const gherkin = [
+      sc.given ? `<div><span style="color:#7c5cd8;font-weight:600">Dado que</span> ${escHtml(sc.given)}</div>` : '',
+      sc.when_  ? `<div><span style="color:#7c5cd8;font-weight:600">Quando</span> ${escHtml(sc.when_)}</div>` : '',
+      sc.then_  ? `<div><span style="color:#7c5cd8;font-weight:600">Então</span> ${escHtml(sc.then_)}</div>` : '',
+    ].join('');
+    return `<tr>
+      <td>${sc.id}</td>
+      <td><strong>${escHtml(sc.title)}</strong></td>
+      <td style="font-size:13px;color:#444">${gherkin || '—'}</td>
+      <td>${tags}</td>
+      <td>
+        <select class="inline-select" onchange="atualizarStatusCenario(${sc.id}, this.value)">${opts}</select>
+      </td>
+      <td><button class="btn btn-danger btn-sm" onclick="excluirCenario(${sc.id})">Excluir</button></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table><thead><tr><th>#</th><th>Título</th><th>Gherkin</th><th>Tags</th><th>Status</th><th>Ações</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// BUGS
+// ═══════════════════════════════════════════════════════
+function criarBug() {
+  const db = loadDB();
+  const title = document.getElementById('bug-titulo').value.trim();
+  if (!title) { flash('Título é obrigatório.', 'error'); return; }
+  db.bugs.push({
+    id: nextId(db), project_id: currentProjectId, title,
+    description:  document.getElementById('bug-desc').value.trim(),
+    steps_repro:  document.getElementById('bug-passos').value.trim(),
+    severity:     document.getElementById('bug-severidade').value,
+    environment:  document.getElementById('bug-ambiente').value.trim(),
+    reported_by:  document.getElementById('bug-reporter').value.trim(),
+    status: 'ABERTO', created_at: now(),
+  });
+  saveDB(db);
+  ['bug-titulo','bug-desc','bug-passos','bug-ambiente','bug-reporter'].forEach(id => document.getElementById(id).value = '');
+  flash(`Bug '${title}' registrado.`);
+  renderBugs();
+}
+
+function salvarBug() {
+  const db = loadDB();
+  const id = parseInt(document.getElementById('mb-id').value);
+  const b = db.bugs.find(x => x.id === id);
+  if (!b) return;
+  const title = document.getElementById('mb-titulo').value.trim();
+  if (!title) { flash('Título é obrigatório.', 'error'); return; }
+  b.title       = title;
+  b.severity    = document.getElementById('mb-severidade').value;
+  b.environment = document.getElementById('mb-ambiente').value.trim();
+  b.description = document.getElementById('mb-desc').value.trim();
+  b.steps_repro = document.getElementById('mb-passos').value.trim();
+  b.reported_by = document.getElementById('mb-reporter').value.trim();
+  saveDB(db);
+  closeModal('modal-bug');
+  flash('Bug atualizado.');
+  renderBugs();
+}
+
+function atualizarStatusBug(id, status) {
+  const db = loadDB();
+  const b = db.bugs.find(x => x.id === id);
+  if (!b) return;
+  b.status = status;
+  saveDB(db);
+  flash('Status do bug atualizado.');
+  renderBugs();
+}
+
+function excluirBug(id) {
+  const db = loadDB();
+  const b = db.bugs.find(x => x.id === id);
+  if (!b || !confirm('Excluir bug?')) return;
+  db.bugs = db.bugs.filter(x => x.id !== id);
+  saveDB(db);
+  flash('Bug excluído.');
+  renderBugs();
+}
+
+function renderBugs() {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === currentProjectId);
+  if (p) document.getElementById('bc-bug-projeto').textContent = p.name;
+  const bugs = db.bugs.filter(b => b.project_id === currentProjectId);
+  document.getElementById('bugs-count').textContent = `Bugs (${bugs.length})`;
+  const el = document.getElementById('table-bugs');
+  if (!bugs.length) { el.innerHTML = emptyState('Nenhum bug registrado.'); return; }
+  const STATUS_BUG = ['ABERTO','EM ANÁLISE','CORRIGIDO','FECHADO','REABERTO'];
+  let rows = bugs.map(b => {
+    const opts = STATUS_BUG.map(s => `<option value="${s}" ${s===b.status?'selected':''}>${s}</option>`).join('');
+    return `<tr>
+      <td>${b.id}</td>
+      <td><strong>${escHtml(b.title)}</strong>${b.description?`<br><span style="font-size:13px;color:#57606a">${escHtml(b.description.slice(0,80))}${b.description.length>80?'…':''}</span>`:''}</td>
+      <td>${badgeHtml(b.severity, sevClass(b.severity))}</td>
+      <td style="font-size:13px">${escHtml(b.environment||'—')}</td>
+      <td style="font-size:13px">${escHtml(b.reported_by||'—')}</td>
+      <td>
+        <select class="inline-select" onchange="atualizarStatusBug(${b.id}, this.value)">${opts}</select>
+      </td>
+      <td style="font-size:12px;color:#57606a;white-space:nowrap">${dateFmt(b.created_at)}</td>
+      <td><div class="btn-group">
+        <button class="btn btn-outline btn-sm" onclick="openModal('modal-bug', loadDB().bugs.find(x=>x.id===${b.id}))">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirBug(${b.id})">Excluir</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `<table><thead><tr><th>#</th><th>Título</th><th>Severidade</th><th>Ambiente</th><th>Reportado por</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORTAR CSV
+// ═══════════════════════════════════════════════════════
+function exportarCSV(projectId) {
+  const db = loadDB();
+  const p = db.projects.find(x => x.id === projectId);
+  if (!p) return;
+  const sids = db.suites.filter(s => s.project_id === projectId).map(s => s.id);
+  const suiteMap = {};
+  db.suites.filter(s => s.project_id === projectId).forEach(s => suiteMap[s.id] = s.name);
+
+  // Casos CSV
+  const casesData = db.cases.filter(c => sids.includes(c.suite_id));
+  let csvCasos = 'id,suite,titulo,descricao,preconditions,steps,expected,priority,status,executed_at\n';
+  casesData.forEach(c => {
+    csvCasos += [c.id, suiteMap[c.suite_id]||'', c.title, c.description||'', c.preconditions||'', c.steps||'', c.expected||'', c.priority, c.status, c.executed_at||''].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',') + '\n';
+  });
+
+  // Bugs CSV
+  const bugsData = db.bugs.filter(b => b.project_id === projectId);
+  let csvBugs = 'id,titulo,descricao,steps_repro,severity,environment,reported_by,status,created_at\n';
+  bugsData.forEach(b => {
+    csvBugs += [b.id, b.title, b.description||'', b.steps_repro||'', b.severity, b.environment||'', b.reported_by||'', b.status, b.created_at].map(v => `"${String(v).replace(/"/g,'""')}"`).join(',') + '\n';
+  });
+
+  downloadFile(`${p.name}_casos.csv`, csvCasos, 'text/csv');
+  setTimeout(() => downloadFile(`${p.name}_bugs.csv`, csvBugs, 'text/csv'), 300);
+  flash('CSV exportado: casos e bugs.');
+}
+
+function downloadFile(name, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER PRINCIPAL
+// ═══════════════════════════════════════════════════════
+function render() {
+  // atualiza storage info
+  try {
+    const used = new Blob([localStorage.getItem(DB_KEY)||'']).size;
+    document.getElementById('nav-storage').textContent = `localStorage · ${(used/1024).toFixed(1)} KB`;
+  } catch {}
+
+  if (currentView === 'dashboard') {
+    const g = getGlobalSummary();
+    document.getElementById('kpi-global').innerHTML = [
+      kpiHtml('Projetos', g.total_projects, 'blue'),
+      kpiHtml('Casos de Teste', g.total_cases, 'blue'),
+      kpiHtml('Bugs Abertos', g.open_bugs, 'red'),
+      kpiHtml('Cobertura Global', g.global_coverage + '%', 'green'),
+      kpiHtml('Taxa de Aprovação', g.global_pass_rate + '%', 'green'),
+      kpiHtml('Total de Bugs', g.total_bugs, 'yellow'),
+      kpiHtml('Cenários', g.total_scenarios, 'blue'),
+    ].join('');
+    renderTabelaProjetos('table-projetos-dash');
+  }
+  else if (currentView === 'projetos') { renderTabelaProjetos('table-projetos-page'); }
+  else if (currentView === 'projeto-detalhe') { renderDetalhe(); }
+  else if (currentView === 'suites')   { renderSuites(); }
+  else if (currentView === 'casos')    { renderCasos(); }
+  else if (currentView === 'cenarios') { renderCenarios(); }
+  else if (currentView === 'bugs')     { renderBugs(); }
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+goTo('dashboard');
+</script>
+</body>
+</html>
