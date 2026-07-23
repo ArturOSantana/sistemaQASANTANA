@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Casos de Teste — {{ projeto.name }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span> <a href="{{ url_for('projeto_detalhe', project_id=projeto.id) }}">{{ projeto.name }}</a>
+  <span>›</span> Casos de Teste
+</div>
+
+<div class="page-header"><h1>Casos de Teste</h1></div>
+
+<!-- Formulário novo caso -->
+<div class="card" style="margin-bottom:24px;">
+  <details>
+    <summary class="btn btn-primary btn-sm" style="display:inline-flex; cursor:pointer;">+ Novo Caso de Teste</summary>
+    <div style="margin-top:16px;">
+    {% if not suites %}
+      <p style="color:#d1242f;">Crie uma <a href="{{ url_for('suites', project_id=projeto.id) }}">suite de teste</a> antes de adicionar casos.</p>
+    {% else %}
+    <form method="post" action="{{ url_for('caso_novo', project_id=projeto.id) }}">
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Suite *</label>
+          <select name="suite_id" required>
+            {% for s in suites %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Prioridade</label>
+          <select name="priority">
+            {% for p in PRIORITY %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Título *</label>
+        <input name="title" type="text" required placeholder="Ex: Login com credenciais válidas">
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea name="description" placeholder="Descrição opcional"></textarea>
+      </div>
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>Pré-condições</label>
+          <textarea name="preconditions" placeholder="O que precisa estar configurado antes"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Passos (separe por | )</label>
+          <textarea name="steps" placeholder="1. Abrir login | 2. Inserir e-mail | 3. Clicar em entrar"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Resultado Esperado</label>
+        <textarea name="expected" placeholder="O que deve acontecer após os passos"></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit">Criar Caso</button>
+    </form>
+    {% endif %}
+    </div>
+  </details>
+</div>
+
+<!-- Tabela de casos -->
+<div class="card">
+  <h2>Casos cadastrados ({{ cases|length }})</h2>
+  {% if not cases %}
+    <p style="color:#57606a;">Nenhum caso de teste cadastrado.</p>
+  {% else %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Título</th>
+        <th>Suite</th>
+        <th>Prioridade</th>
+        <th>Status</th>
+        <th>Executado em</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for tc in cases %}
+      {% set st = tc.status %}
+      {% if st == 'PASSOU' %}{% set badge_class = 'badge-green' %}
+      {% elif st == 'FALHOU' %}{% set badge_class = 'badge-red' %}
+      {% elif st == 'BLOQUEADO' %}{% set badge_class = 'badge-yellow' %}
+      {% elif st == 'IGNORADO' %}{% set badge_class = 'badge-purple' %}
+      {% else %}{% set badge_class = 'badge-gray' %}{% endif %}
+
+      {% set prio = tc.priority %}
+      {% if prio == 'CRÍTICA' %}{% set prio_class = 'badge-red' %}
+      {% elif prio == 'ALTA' %}{% set prio_class = 'badge-yellow' %}
+      {% elif prio == 'MÉDIA' %}{% set prio_class = 'badge-blue' %}
+      {% else %}{% set prio_class = 'badge-gray' %}{% endif %}
+      <tr>
+        <td>{{ tc.id }}</td>
+        <td>
+          <strong>{{ tc.title }}</strong>
+          {% if tc.description %}<br><span style="font-size:13px; color:#57606a;">{{ tc.description[:80] }}{% if tc.description|length > 80 %}…{% endif %}</span>{% endif %}
+        </td>
+        <td><span class="badge badge-gray">{{ tc.suite_name }}</span></td>
+        <td><span class="badge {{ prio_class }}">{{ prio }}</span></td>
+        <td>
+          <form method="post" action="{{ url_for('caso_status', case_id=tc.id) }}" style="display:flex; gap:4px; align-items:center;">
+            <input type="hidden" name="project_id" value="{{ projeto.id }}">
+            <select name="status" style="font-size:13px; padding:3px 6px; border:1px solid #d0d7de; border-radius:4px;">
+              {% for s in STATUS_TC %}<option value="{{ s }}" {% if s == st %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-outline btn-sm" type="submit">✓</button>
+          </form>
+        </td>
+        <td style="font-size:12px; color:#57606a; white-space:nowrap;">{{ tc.executed_at[:10] if tc.executed_at else '—' }}</td>
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-outline btn-sm" href="{{ url_for('caso_editar', case_id=tc.id) }}">Editar</a>
+            <form class="inline-form" method="post" action="{{ url_for('caso_excluir', case_id=tc.id) }}"
+                  onsubmit="return confirm('Excluir caso \'{{ tc.title }}\'?')">
+              <input type="hidden" name="project_id" value="{{ projeto.id }}">
+              <button class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}

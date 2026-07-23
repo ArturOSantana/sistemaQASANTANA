@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Global — Sistema QA{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Dashboard Global</h1>
+  <p>Visão geral de todos os projetos</p>
+</div>
+
+<div class="grid grid-4" style="margin-bottom:24px;">
+  <div class="kpi blue">
+    <div class="label">Projetos</div>
+    <div class="value">{{ summary.total_projects }}</div>
+  </div>
+  <div class="kpi blue">
+    <div class="label">Casos de Teste</div>
+    <div class="value">{{ summary.total_cases }}</div>
+  </div>
+  <div class="kpi red">
+    <div class="label">Bugs Abertos</div>
+    <div class="value">{{ summary.open_bugs }}</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">Cobertura Global</div>
+    <div class="value">{{ summary.global_coverage }}%</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">Taxa de Aprovação</div>
+    <div class="value">{{ summary.global_pass_rate }}%</div>
+  </div>
+  <div class="kpi yellow">
+    <div class="label">Total de Bugs</div>
+    <div class="value">{{ summary.total_bugs }}</div>
+  </div>
+  <div class="kpi blue">
+    <div class="label">Cenários</div>
+    <div class="value">{{ summary.total_scenarios }}</div>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+    <h2 style="margin:0;">Projetos</h2>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('projeto_novo') }}">+ Novo Projeto</a>
+  </div>
+
+  {% if not projects %}
+    <p style="color:#57606a; font-size:14px;">Nenhum projeto cadastrado ainda.
+      <a href="{{ url_for('projeto_novo') }}">Criar o primeiro projeto</a>.
+    </p>
+  {% else %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nome</th>
+        <th>Descrição</th>
+        <th>Criado em</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in projects %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td><a href="{{ url_for('projeto_detalhe', project_id=p.id) }}"><strong>{{ p.name }}</strong></a></td>
+        <td style="color:#57606a;">{{ p.description or '—' }}</td>
+        <td style="color:#57606a; font-size:13px; white-space:nowrap;">{{ p.created_at[:10] }}</td>
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-outline btn-sm" href="{{ url_for('projeto_detalhe', project_id=p.id) }}">Ver</a>
+            <a class="btn btn-outline btn-sm" href="{{ url_for('projeto_editar', project_id=p.id) }}">Editar</a>
+            <form class="inline-form" action="{{ url_for('projeto_excluir', project_id=p.id) }}" method="post"
+                  onsubmit="return confirm('Excluir projeto \'{{ p.name }}\'? Todos os dados serão removidos.')">
+              <button class="btn btn-danger btn-sm" type="submit">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

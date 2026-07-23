@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Projetos — Sistema QA{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Projetos</h1>
+</div>
+<div style="margin-bottom:16px;">
+  <a class="btn btn-primary" href="{{ url_for('projeto_novo') }}">+ Novo Projeto</a>
+</div>
+<div class="card">
+  {% if not projects %}
+    <p style="color:#57606a;">Nenhum projeto cadastrado.</p>
+  {% else %}
+  <table>
+    <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Criado em</th><th>Ações</th></tr></thead>
+    <tbody>
+    {% for p in projects %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td><a href="{{ url_for('projeto_detalhe', project_id=p.id) }}"><strong>{{ p.name }}</strong></a></td>
+        <td style="color:#57606a;">{{ p.description or '—' }}</td>
+        <td style="color:#57606a; font-size:13px;">{{ p.created_at[:10] }}</td>
+        <td>
+          <div class="btn-group">
+            <a class="btn btn-outline btn-sm" href="{{ url_for('projeto_detalhe', project_id=p.id) }}">Ver</a>
+            <a class="btn btn-outline btn-sm" href="{{ url_for('projeto_editar', project_id=p.id) }}">Editar</a>
+            <form class="inline-form" action="{{ url_for('projeto_excluir', project_id=p.id) }}" method="post"
+                  onsubmit="return confirm('Excluir \'{{ p.name }}\'?')">
+              <button class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

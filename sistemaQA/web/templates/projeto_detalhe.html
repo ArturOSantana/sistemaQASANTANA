@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ projeto.name }} — Detalhe do Projeto{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span> {{ projeto.name }}
+</div>
+
+<div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+  <div>
+    <h1>{{ projeto.name }}</h1>
+    {% if projeto.description %}<p>{{ projeto.description }}</p>{% endif %}
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-outline btn-sm" href="{{ url_for('projeto_editar', project_id=projeto.id) }}">Editar</a>
+    <a class="btn btn-outline btn-sm" href="{{ url_for('relatorio', project_id=projeto.id) }}">⬇ Gerar HTML</a>
+    <a class="btn btn-outline btn-sm" href="{{ url_for('exportar_csv', project_id=projeto.id) }}">⬇ Exportar CSV</a>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-4" style="margin-bottom:24px;">
+  <div class="kpi blue">
+    <div class="label">Total Casos</div>
+    <div class="value">{{ summary.total_cases }}</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">Passaram</div>
+    <div class="value">{{ summary.passed }}</div>
+  </div>
+  <div class="kpi red">
+    <div class="label">Falharam</div>
+    <div class="value">{{ summary.failed }}</div>
+  </div>
+  <div class="kpi yellow">
+    <div class="label">Bloqueados</div>
+    <div class="value">{{ summary.blocked }}</div>
+  </div>
+  <div class="kpi blue">
+    <div class="label">Cobertura</div>
+    <div class="value">{{ summary.coverage }}%</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">Taxa Aprovação</div>
+    <div class="value">{{ summary.pass_rate }}%</div>
+  </div>
+  <div class="kpi red">
+    <div class="label">Bugs</div>
+    <div class="value">{{ summary.total_bugs }}</div>
+  </div>
+  <div class="kpi blue">
+    <div class="label">Cenários</div>
+    <div class="value">{{ summary.total_scenarios }}</div>
+  </div>
+</div>
+
+<!-- GRÁFICOS SVG simples -->
+<div class="grid grid-2" style="margin-bottom:24px;">
+  <!-- Status dos Casos -->
+  <div class="card">
+    <h2>Status dos Casos de Teste</h2>
+    {% set sc = summary.cases_by_status %}
+    {% set total = summary.total_cases %}
+    {% if total > 0 %}
+      {% set bar_data = [
+        ('PASSOU',         sc.get('PASSOU', 0),         '#1a7f37'),
+        ('FALHOU',         sc.get('FALHOU', 0),         '#d1242f'),
+        ('BLOQUEADO',      sc.get('BLOQUEADO', 0),      '#9a6700'),
+        ('IGNORADO',       sc.get('IGNORADO', 0),       '#7c5cd8'),
+        ('NÃO EXECUTADO',  sc.get('NÃO EXECUTADO', 0),  '#57606a'),
+      ] %}
+      {% for label, val, color in bar_data %}
+        {% if val > 0 %}
+          {% set pct = (val / total * 100) | round(1) %}
+          <div style="margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:3px;">
+              <span>{{ label }}</span><span style="color:#57606a;">{{ val }} ({{ pct }}%)</span>
+            </div>
+            <div style="height:10px; background:#e5e7eb; border-radius:5px; overflow:hidden;">
+              <div style="width:{{ pct }}%; height:100%; background:{{ color }}; border-radius:5px;"></div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p style="color:#57606a; font-size:14px;">Sem casos de teste.</p>
+    {% endif %}
+  </div>
+
+  <!-- Bugs por severidade -->
+  <div class="card">
+    <h2>Bugs por Severidade</h2>
+    {% set bsev = summary.bugs_by_severity %}
+    {% set total_b = summary.total_bugs %}
+    {% if total_b > 0 %}
+      {% set sev_data = [
+        ('CRÍTICA', bsev.get('CRÍTICA', 0), '#d1242f'),
+        ('ALTA',    bsev.get('ALTA', 0),    '#e36209'),
+        ('MÉDIA',   bsev.get('MÉDIA', 0),   '#9a6700'),
+        ('BAIXA',   bsev.get('BAIXA', 0),   '#1a7f37'),
+      ] %}
+      {% for label, val, color in sev_data %}
+        {% if val > 0 %}
+          {% set pct = (val / total_b * 100) | round(1) %}
+          <div style="margin-bottom:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:3px;">
+              <span>{{ label }}</span><span style="color:#57606a;">{{ val }} ({{ pct }}%)</span>
+            </div>
+            <div style="height:10px; background:#e5e7eb; border-radius:5px; overflow:hidden;">
+              <div style="width:{{ pct }}%; height:100%; background:{{ color }}; border-radius:5px;"></div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p style="color:#57606a; font-size:14px;">Nenhum bug registrado.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- LINKS RÁPIDOS -->
+<div class="card">
+  <h2>Módulos do Projeto</h2>
+  <div class="btn-group">
+    <a class="btn btn-outline" href="{{ url_for('suites', project_id=projeto.id) }}">Suites de Teste</a>
+    <a class="btn btn-outline" href="{{ url_for('casos', project_id=projeto.id) }}">Casos de Teste</a>
+    <a class="btn btn-outline" href="{{ url_for('cenarios', project_id=projeto.id) }}">Cenários Gherkin</a>
+    <a class="btn btn-outline" href="{{ url_for('bugs', project_id=projeto.id) }}">Bugs</a>
+  </div>
+</div>
+
+{% endblock %}

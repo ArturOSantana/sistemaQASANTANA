@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Sistema QA{% endblock %}</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; font-size: 15px; line-height: 1.6; background: #f0f2f5; color: #1f2328; }
+a { color: #3b82d4; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* NAV */
+nav { background: #1a2332; color: #fff; padding: 0 24px; display: flex; align-items: center; gap: 24px; height: 52px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+nav .brand { font-weight: 700; font-size: 16px; color: #fff; letter-spacing: .5px; }
+nav .brand span { color: #4ca3ff; }
+nav a { color: #c9d1d9; font-size: 14px; padding: 4px 8px; border-radius: 4px; }
+nav a:hover { background: rgba(255,255,255,.1); color: #fff; text-decoration: none; }
+nav .spacer { flex: 1; }
+
+/* MAIN */
+main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p  { color: #57606a; font-size: 14px; margin-top: 4px; }
+
+/* CARDS */
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; }
+.card h2 { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #1f2328; }
+
+/* GRID */
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+/* KPI */
+.kpi { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; }
+.kpi .label { font-size: 12px; color: #57606a; text-transform: uppercase; letter-spacing: .5px; }
+.kpi .value { font-size: 28px; font-weight: 700; line-height: 1.2; margin-top: 4px; }
+.kpi.red .value    { color: #d1242f; }
+.kpi.green .value  { color: #1a7f37; }
+.kpi.blue .value   { color: #3b82d4; }
+.kpi.yellow .value { color: #9a6700; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid transparent; }
+.btn-primary { background: #3b82d4; color: #fff; border-color: #3b82d4; }
+.btn-primary:hover { background: #2563af; border-color: #2563af; color: #fff; text-decoration: none; }
+.btn-danger  { background: #d1242f; color: #fff; border-color: #d1242f; }
+.btn-danger:hover { background: #a0191e; border-color: #a0191e; }
+.btn-outline { background: #fff; color: #1f2328; border-color: #d0d7de; }
+.btn-outline:hover { background: #f6f8fa; color: #1f2328; text-decoration: none; }
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+.btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* FORM */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #444; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 8px 12px; border: 1px solid #d0d7de; border-radius: 6px;
+  font-size: 14px; font-family: inherit; background: #fff; color: #1f2328;
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: #3b82d4; box-shadow: 0 0 0 3px rgba(59,130,212,.15);
+}
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { background: #f6f8fa; text-align: left; padding: 9px 12px; font-size: 12px; font-weight: 600; color: #57606a; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #e5e7eb; }
+td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafbfc; }
+
+/* BADGES */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.badge-green  { background: #d4edda; color: #155724; }
+.badge-red    { background: #fce4e4; color: #a00; }
+.badge-yellow { background: #fff3cd; color: #856404; }
+.badge-blue   { background: #d0e6ff; color: #1a56a8; }
+.badge-gray   { background: #e9ecef; color: #444; }
+.badge-purple { background: #ede0ff; color: #6f42c1; }
+
+/* FLASH */
+.flash { padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+.flash.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flash.error   { background: #fce4e4; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* BREADCRUMB */
+.breadcrumb { font-size: 13px; color: #57606a; margin-bottom: 16px; }
+.breadcrumb a { color: #57606a; }
+.breadcrumb span { margin: 0 6px; }
+
+/* MODAL */
+details summary { cursor: pointer; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+.inline-form { display: inline; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="{{ url_for('index') }}">Sistema <span>QA</span></a>
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <div class="spacer"></div>
+</nav>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash {{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

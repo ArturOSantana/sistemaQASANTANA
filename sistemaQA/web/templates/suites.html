@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Suites — {{ projeto.name }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('projetos') }}">Projetos</a>
+  <span>›</span> <a href="{{ url_for('projeto_detalhe', project_id=projeto.id) }}">{{ projeto.name }}</a>
+  <span>›</span> Suites de Teste
+</div>
+
+<div class="page-header"><h1>Suites de Teste</h1></div>
+
+<div class="card" style="max-width:560px; margin-bottom:24px;">
+  <h2>Nova Suite</h2>
+  <form method="post" action="{{ url_for('suite_nova', project_id=projeto.id) }}">
+    <div class="form-group">
+      <label>Nome *</label>
+      <input name="name" type="text" required placeholder="Ex: Autenticação, Checkout...">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea name="description" placeholder="Opcional"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Criar Suite</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Suites cadastradas</h2>
+  {% if not suites %}
+    <p style="color:#57606a;">Nenhuma suite ainda.</p>
+  {% else %}
+  <table>
+    <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th>Criada em</th><th>Ações</th></tr></thead>
+    <tbody>
+    {% for s in suites %}
+      <tr>
+        <td>{{ s.id }}</td>
+        <td><strong>{{ s.name }}</strong></td>
+        <td style="color:#57606a;">{{ s.description or '—' }}</td>
+        <td style="color:#57606a; font-size:13px;">{{ s.created_at[:10] }}</td>
+        <td>
+          <form class="inline-form" action="{{ url_for('suite_excluir', suite_id=s.id) }}" method="post"
+                onsubmit="return confirm('Excluir suite \'{{ s.name }}\' e todos os seus casos?')">
+            <button class="btn btn-danger btn-sm">Excluir</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+
+{% endblock %}
